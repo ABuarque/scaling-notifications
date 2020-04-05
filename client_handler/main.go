@@ -45,6 +45,7 @@ func formatSSE(payloadAsString string) []byte {
 func listenHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	userID := r.FormValue("id")
 	_, err := client.Set(userID, queueName, 0).Result()
 	if err != nil {
@@ -58,10 +59,12 @@ func listenHandler(w http.ResponseWriter, r *http.Request) {
 		messageChannel: make(chan []byte),
 	}
 	sessions[userID] = currentSession
+	log.Println("new user ", userID)
 	for {
 		select {
 		case message := <-currentSession.messageChannel:
 			w.Write(formatSSE(string(message)))
+			log.Println("message sent to user ", userID)
 			w.(http.Flusher).Flush()
 		case <-r.Context().Done():
 			delete(sessions, userID)
@@ -85,7 +88,7 @@ func listenToEvents() {
 			s := sessions[dm.UserID]
 			log.Println("dm: ", dm)
 			s.messageChannel <- []byte(dm.Payload)
-			log.Println(fmt.Sprintf("published message %s to user %s", dm.Payload, dm.UserID))
+			log.Println(fmt.Sprintf("sent message %s to user %s", dm.Payload, dm.UserID))
 		}
 	}
 }

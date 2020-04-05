@@ -16,9 +16,6 @@ services:
 
   sse:
     image: animal505/sse
-    container_name: sse
-    ports:
-      - 8080:8080
     networks:
       - default
     expose:
@@ -34,7 +31,16 @@ services:
     image: redis
     networks:
       - default
-
+  
+  reverseproxy:
+    image: animal505/rp
+    container_name: reverseproxy
+    depends_on:
+      - sse
+    ports:
+      - "4000:4000"
+    networks:
+      - default
 
 networks: 
   default: 
