@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  dispatcher:
+    image: animal505/dispatcher
+    container_name: dispatcher
+    depends_on:
+       - redis
+    ports:
+      - 8081:8080
+    environment:
+       REDIS_HOST: "redis"
+       SERVER_PORT: 8080
+
+  sse:
+    image: animal505/sse
+    container_name: sse
+    ports:
+      - 8080:8080
+    expose:
+      - "8080"
+    depends_on:
+       - redis
+    environment:
+       REDIS_HOST: "redis"
+       SERVER_PORT: 8080
+
+  redis:
+    container_name: redis
+    image: redis
+
+
