@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +23,13 @@ type UserSSESession struct {
 	messageChannel chan []byte
 }
 
+type dispatchMessage struct {
+	UserID  string `json:"userID"`
+	Payload string `json:"payload"`
+}
+
+// TODO change implemenation to keep number of connections
+// and return 503 in case of 85%
 var sessions = make(map[string]*UserSSESession)
 
 // it formats the payload according with SSE protocol
@@ -68,7 +76,16 @@ func listenToEvents() {
 	ch := pubsub.Channel()
 	for {
 		for msg := range ch {
-			fmt.Println(msg.Channel, msg.Payload)
+			//fmt.Println(msg.Channel, msg.Payload)
+			dm := dispatchMessage{}
+			err := json.Unmarshal([]byte(msg.Payload), &dm)
+			if err != nil {
+				log.Println("problem on parsing message: ", err)
+			}
+			s := sessions[dm.UserID]
+			log.Println("dm: ", dm)
+			s.messageChannel <- []byte(dm.Payload)
+			log.Println(fmt.Sprintf("published message %s to user %s", dm.Payload, dm.UserID))
 		}
 	}
 }
