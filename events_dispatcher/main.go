@@ -63,7 +63,11 @@ func main() {
 	if err != nil {
 		log.Fatal("problem on connect ro redis: %q", err)
 	}
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8081"
+	}
 	log.Println("connected to redis at host: ", redisHost)
 	http.HandleFunc("/dispatch", dispatchHandler)
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -7,7 +7,9 @@ services:
     depends_on:
        - redis
     ports:
-      - 8081:8080
+      - 8082:8080
+    networks:
+      - default
     environment:
        REDIS_HOST: "redis"
        SERVER_PORT: 8080
@@ -17,6 +19,8 @@ services:
     container_name: sse
     ports:
       - 8080:8080
+    networks:
+      - default
     expose:
       - "8080"
     depends_on:
@@ -28,5 +32,9 @@ services:
   redis:
     container_name: redis
     image: redis
+    networks:
+      - default
 
 
+networks: 
+  default: 
