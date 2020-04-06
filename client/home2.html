@@ -1,0 +1,19 @@
+<html>
+
+<head>
+    <title>SSE</title>
+</head>
+
+<body>
+    <!-- test.html -->
+    <script type="text/javascript">
+        let eventListener = new EventSource("http://localhost:4000/listen?id=90")
+        eventListener.onmessage = (event) => {
+            let { type, data } = event;
+            alert(`received event: ${type} with data: ${data}`)
+            //alert(`got ${event}`);
+        }
+    </script>
+</body>
+
+</html>

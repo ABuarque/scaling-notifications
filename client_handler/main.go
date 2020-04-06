@@ -43,8 +43,17 @@ func formatSSE(payloadAsString string) []byte {
 }
 
 func listenHandler(w http.ResponseWriter, r *http.Request) {
+	// sessionsNow := len(sessions)
+	// log.Println("sessions: ", sessionsNow)
+	// if sessionsNow >= 2 {
+	// 	log.Println("service unavailable")
+	// 	w.WriteHeader(http.StatusServiceUnavailable)
+	// 	return
+	// }
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	userID := r.FormValue("id")
 	_, err := client.Set(userID, queueName, 0).Result()
